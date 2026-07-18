@@ -1,0 +1,11 @@
+foods:
+  - id: f1
+    name: garlic
+
+healthBenefits:
+  - id: b1
+    benefit: Heart Health
+
+associations:
+  - foodId: f1
+    benefitId: b1
