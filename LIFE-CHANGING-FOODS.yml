@@ -1,11 +1,55 @@
 foods:
   - id: f1
-    name: garlic
+    name: asparagus
+  - id: f2
+    name: banana
+  - id: f3
+    name: sweet potatoes
+  - id: f4
+    name: cruciferous veggies
+  - id: f5
+    name: red clover
+  - id: f6
+    name: dandelion
+  - id: f7
+    name: coconut
+  - id: f8
+    name: turmeric
+  - id: f9
+    name: parsley
+  - id: f10
+    name: lemon balm
+  - id: f11
+    name: ginger
 
 healthBenefits:
   - id: b1
-    benefit: Heart Health
+    benefit: weight loss
 
 associations:
   - foodId: f1
     benefitId: b1
+  - foodId: f2
+    benefitId: b1
+  - foodId: f3
+    benefitId: b1
+  - foodId: f4
+    benefitId: b1
+  - foodId: f5
+    benefitId: b1
+  - foodId: f6
+    benefitId: b1
+  - foodId: f7
+    benefitId: b1
+  - foodId: f8
+    benefitId: b1
+  - foodId: f9
+    benefitId: b1
+  - foodId: f10
+    benefitId: b1
+  - foodId: f11
+    benefitId: b1
+
+# weight loss
+#   avoid 89, 511, 512
+#   eat 93, 101, 105, 121, 125, 145, 157, 185, 215, 229, 236, 260, 268, 293
