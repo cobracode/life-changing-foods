@@ -1,27 +1,35 @@
 foods:
   - id: f1
     name: asparagus
+    page: 435
   - id: f2
     name: bananas
     page: 101
   - id: f3
     name: sweet potatoes
+    page: 477
   - id: f4
     name: cruciferous veggies
+    page: 445
   - id: f5
     name: red clover
   - id: f6
     name: dandelion
   - id: f7
     name: coconut
+    page: 361
   - id: f8
     name: turmeric
+    page: 339
   - id: f9
     name: parsley
+    page: 331
   - id: f10
     name: lemon balm
+    page: 319
   - id: f11
     name: ginger
+    page: 309
   - id: f12
     name: cilantro
     page: 293
@@ -61,12 +69,67 @@ foods:
   - id: f24
     name: apricots
     page: 93
+  - id: f25
+    name: potatoes
+    page: 467
+  - id: f26
+    name: peas
+    page: 461
+  - id: f27
+    name: green beans
+    page: 449
+  - id: f28
+    name: nettle leaf
+    page: 381
+  - id: f29
+    name: dulse, atlantic sea veggies
+    page: 349
+  - id: f30
+    name: fennel
+    page: 301
+
+# anxiety
+# avoid: 512, 514, 516, 518
+# heal: 88, 96, 100, 105, 108, 117, 120, 125, 149, 157, 160, 165 169 260 267 287 293
+# truth about: 12, 22-23
 
 healthBenefits:
   - id: b1
     benefit: weight loss
+  - id: b2
+    benefit: anxiety healed
 
 associations:
+  # anxiety
+  - foodId: f3
+    benefit: b2
+  - foodId: f25
+    benefit: b2
+  - foodId: f26
+    benefit: b2
+  - foodId: f27
+    benefit: b2
+  - foodId: f4
+    benefit: b2
+  - foodId: f1
+    benefit: b2
+  - foodId: f28
+    benefit: b2
+  - foodId: f7
+    benefit: b2
+  - foodId: f29
+    benefit: b2
+  - foodId: f8
+    benefit: b2
+  - foodId: f9
+    benefit: b2
+  - foodId: f10
+    benefit: b2
+  - foodId: f11
+    benefit: b2
+  - foodId: f30
+    benefit: b2
+  # weight loss
   - foodId: f1
     benefitId: b1
   - foodId: f2
