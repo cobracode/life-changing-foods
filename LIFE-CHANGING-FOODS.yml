@@ -2,7 +2,8 @@ foods:
   - id: f1
     name: asparagus
   - id: f2
-    name: banana
+    name: bananas
+    page: 101
   - id: f3
     name: sweet potatoes
   - id: f4
@@ -21,6 +22,45 @@ foods:
     name: lemon balm
   - id: f11
     name: ginger
+  - id: f12
+    name: cilantro
+    page: 293
+  - id: f13
+    name: sprouts & microgreens
+    page: 268
+  - id: f14
+    name: spinach, lettuce, greens
+    page: 260
+  - id: f15
+    name: watermelon
+    page: 236
+  - id: f16
+    name: tomatoes
+    page: 229
+  - id: f17
+    name: pomegranates
+    page: 215
+  - id: f18
+    name: pears
+    page: 185
+  - id: f19
+    name: lemons & limes
+    page: 157
+  - id: f20
+    name: grapefruit
+    page: 145
+  - id: f21
+    name: cucumbers
+    page: 125
+  - id: f22
+    name: cranberries
+    page: 121
+  - id: f23
+    name: berries
+    page: 105
+  - id: f24
+    name: apricots
+    page: 93
 
 healthBenefits:
   - id: b1
@@ -49,7 +89,30 @@ associations:
     benefitId: b1
   - foodId: f11
     benefitId: b1
+  - foodId: f12
+    benefitId: b1
+  - foodId: f13
+    benefitId: b1
+  - foodId: f14
+    benefitId: b1
+  - foodId: f15
+    benefitId: b1
+  - foodId: f16
+    benefitId: b1
+  - foodId: f17
+    benefitId: b1
+  - foodId: f18
+    benefitId: b1
+  - foodId: f19
+    benefitId: b1
+  - foodId: f20
+    benefitId: b1
+  - foodId: f21
+    benefitId: b1
+  - foodId: f22
+    benefitId: b1
+  - foodId: f23
+    benefitId: b1
+  - foodId: f24
+    benefitId: b1
 
-# weight loss
-#   avoid 89, 511, 512
-#   eat 93, 101, 105, 121, 125, 145, 157, 185, 215, 229, 236, 260, 268, 293
