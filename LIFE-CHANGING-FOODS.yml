@@ -102,33 +102,33 @@ healthBenefits:
 associations:
   # anxiety
   - foodId: f3
-    benefit: b2
+    benefitId: b2
   - foodId: f25
-    benefit: b2
+    benefitId: b2
   - foodId: f26
-    benefit: b2
+    benefitId: b2
   - foodId: f27
-    benefit: b2
+    benefitId: b2
   - foodId: f4
-    benefit: b2
+    benefitId: b2
   - foodId: f1
-    benefit: b2
+    benefitId: b2
   - foodId: f28
-    benefit: b2
+    benefitId: b2
   - foodId: f7
-    benefit: b2
+    benefitId: b2
   - foodId: f29
-    benefit: b2
+    benefitId: b2
   - foodId: f8
-    benefit: b2
+    benefitId: b2
   - foodId: f9
-    benefit: b2
+    benefitId: b2
   - foodId: f10
-    benefit: b2
+    benefitId: b2
   - foodId: f11
-    benefit: b2
+    benefitId: b2
   - foodId: f30
-    benefit: b2
+    benefitId: b2
   # weight loss
   - foodId: f1
     benefitId: b1
