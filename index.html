@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food & Benefits Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Enable class-based dark mode control in Tailwind
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-950 min-h-screen font-sans p-4 sm:p-6 transition-colors duration-200">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        <header class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-center sm:text-left">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Life-Changing Foods Manager</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Upload your YAML file to start editing and looking up data.</p>
+                <input type="file" id="fileInput" accept=".yml,.yaml" class="mt-3 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-950 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900 cursor-pointer" />
+            </div>
+            
+            <div class="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700">
+                <label for="themeSelect" class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Theme:</label>
+                <select id="themeSelect" class="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="system">System</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="md:col-span-1 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm h-[500px] md:h-[650px] flex flex-col">
+                <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+                    <button id="tabFood" class="w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer">
+                        By Food
+                    </button>
+                    <button id="tabBenefit" class="w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer">
+                        By Benefit
+                    </button>
+                </div>
+                
+                <div id="explorerTitle" class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">Foods List</div>
+                <div id="explorerList" class="overflow-y-auto space-y-1 flex-1 pr-1">
+                    <p class="text-gray-400 dark:text-gray-500 text-sm">Please upload a YAML file...</p>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm flex flex-col justify-between min-h-[400px]">
+                <div>
+                    <h2 id="panelHeader" class="text-lg font-semibold text-gray-700 dark:text-gray-200 border-b dark:border-gray-700 pb-2">Panel Preview</h2>
+                    
+                    <div id="foodEditorContent" class="hidden space-y-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Food Name</label>
+                            <input type="text" id="editName" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Page Number</label>
+                            <input type="number" id="editPage" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Associated Benefits</label>
+                            <div id="benefitsCheckboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-800">
+                                </div>
+                        </div>
+
+                        <button id="saveChangesBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm transition cursor-pointer">
+                            Update Memory State
+                        </button>
+                    </div>
+                    
+                    <div id="benefitDisplayContent" class="hidden space-y-4 mt-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Foods linked to this benefit health group:</p>
+                        <div id="associatedFoodsContainer" class="border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-100 dark:divide-gray-800 max-h-96 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+                            </div>
+                    </div>
+                    
+                    <div id="panelPlaceholder" class="text-center text-gray-400 dark:text-gray-500 py-12">
+                        Select an item from the left explorer window to view or edit details.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer id="exportSection" class="hidden bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
+            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Changes are saved in memory! Export when done:</span>
+            <button id="exportYamlBtn" class="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-medium py-2 px-6 rounded-md shadow-sm transition w-full sm:w-auto text-center cursor-pointer">
+                Download Updated YAML File
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        let appData = null;
+        let selectedFoodId = null;
+        let selectedBenefitId = null;
+        let currentTab = 'food';
+
+        // --- Theme Engine Initialization ---
+        const themeSelect = document.getElementById('themeSelect');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function applyTheme() {
+            const currentSetting = localStorage.getItem('editor-theme') || 'system';
+            themeSelect.value = currentSetting;
+
+            if (currentSetting === 'dark' || (currentSetting === 'system' && systemPrefersDark.matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        themeSelect.addEventListener('change', (e) => {
+            localStorage.setItem('editor-theme', e.target.value);
+            applyTheme();
+        });
+
+        // Listen for live external host system preference adaptations
+        systemPrefersDark.addEventListener('change', () => {
+            if (localStorage.getItem('editor-theme') === 'system') {
+                applyTheme();
+            }
+        });
+
+        // Bootstrap visual settings runtime state 
+        applyTheme();
+
+        // --- Data Handling Core Modules ---
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = jsyaml.load(evt.target.result);
+                    if (!parsed || typeof parsed !== 'object') {
+                        throw new Error("Invalid format structure object layout detected.");
+                    }
+
+                    appData = parsed;
+                    
+                    if (!appData.foods || !Array.isArray(appData.foods)) appData.foods = [];
+                    if (!appData.healthBenefits || !Array.isArray(appData.healthBenefits)) appData.healthBenefits = [];
+                    if (!appData.associations || !Array.isArray(appData.associations)) appData.associations = [];
+
+                    appData.foods.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    appData.healthBenefits.sort((a, b) => (a.benefit || '').localeCompare(b.benefit || ''));
+
+                    resetActiveSelections();
+                    renderExplorer();
+                    
+                    document.getElementById('exportSection').classList.remove('hidden');
+                } catch (err) {
+                    console.error(err);
+                    alert('Error parsing YAML file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('tabFood').addEventListener('click', () => switchTab('food'));
+        document.getElementById('tabBenefit').addEventListener('click', () => switchTab('benefit'));
+
+        function switchTab(tab) {
+            if (!appData || currentTab === tab) return;
+            currentTab = tab;
+            
+            const btnFood = document.getElementById('tabFood');
+            const btnBenefit = document.getElementById('tabBenefit');
+            
+            if (tab === 'food') {
+                btnFood.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
+                btnBenefit.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
+                document.getElementById('explorerTitle').innerText = "Foods List";
+            } else {
+                btnBenefit.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
+                btnFood.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
+                document.getElementById('explorerTitle').innerText = "Health Benefits Index";
+            }
+            
+            resetActiveSelections();
+            renderExplorer();
+            showPlaceholder();
+        }
+
+        function resetActiveSelections() {
+            selectedFoodId = null;
+            selectedBenefitId = null;
+        }
+
+        function renderExplorer() {
+            const listContainer = document.getElementById('explorerList');
+            listContainer.innerHTML = '';
+            if (!appData) return;
+
+            if (currentTab === 'food') {
+                if (appData.foods.length === 0) {
+                    listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No food items found.</p>`;
+                    return;
+                }
+                appData.foods.forEach(food => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
+                        selectedFoodId === food.id 
+                        ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
+                        : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }`;
+                    btn.innerHTML = `<div class="flex justify-between items-center"><span>${food.name}</span><span class="text-xs text-gray-400 dark:text-gray-500">p. ${food.page || '--'}</span></div>`;
+                    btn.onclick = () => selectFood(food.id);
+                    listContainer.appendChild(btn);
+                });
+            } else {
+                if (appData.healthBenefits.length === 0) {
+                    listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No health benefits items found.</p>`;
+                    return;
+                }
+                appData.healthBenefits.forEach(benefit => {
+                    const count = appData.associations.filter(a => a.benefitId === benefit.id).length;
+                    
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
+                        selectedBenefitId === benefit.id 
+                        ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
+                        : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }`;
+                    btn.innerHTML = `<div class="flex justify-between items-center"><span>${benefit.benefit}</span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">${count}</span></div>`;
+                    btn.onclick = () => selectBenefit(benefit.id);
+                    listContainer.appendChild(btn);
+                });
+            }
+        }
+
+        function showPlaceholder() {
+            document.getElementById('panelPlaceholder').classList.remove('hidden');
+            document.getElementById('foodEditorContent').classList.add('hidden');
+            document.getElementById('benefitDisplayContent').classList.add('hidden');
+            document.getElementById('panelHeader').innerText = "Panel Preview";
+        }
+
+        function selectFood(foodId) {
+            selectedFoodId = foodId;
+            renderExplorer();
+
+            const food = appData.foods.find(f => f.id === foodId);
+            document.getElementById('panelHeader').innerText = `Editing: ${food.name}`;
+            
+            document.getElementById('panelPlaceholder').classList.add('hidden');
+            document.getElementById('benefitDisplayContent').classList.add('hidden');
+            document.getElementById('foodEditorContent').classList.remove('hidden');
+
+            document.getElementById('editName').value = food.name || '';
+            document.getElementById('editPage').value = food.page || '';
+
+            const activeBenefitIds = appData.associations
+                .filter(assoc => assoc.foodId === foodId)
+                .map(assoc => assoc.benefitId);
+
+            const checkboxesContainer = document.getElementById('benefitsCheckboxes');
+            checkboxesContainer.innerHTML = '';
+
+            appData.healthBenefits.forEach(benefit => {
+                const label = document.createElement('label');
+                label.className = "flex items-center space-x-3 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300";
+                
+                const isChecked = activeBenefitIds.includes(benefit.id) ? 'checked' : '';
+                label.innerHTML = `
+                    <input type="checkbox" data-benefit-id="${benefit.id}" ${isChecked} class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 h-4 w-4" />
+                    <span>${benefit.benefit}</span>
+                `;
+                checkboxesContainer.appendChild(label);
+            });
+        }
+
+        function selectBenefit(benefitId) {
+            selectedBenefitId = benefitId;
+            renderExplorer();
+
+            const benefit = appData.healthBenefits.find(b => b.id === benefitId);
+            document.getElementById('panelHeader').innerText = `Linked Foods: ${benefit.benefit}`;
+
+            document.getElementById('panelPlaceholder').classList.add('hidden');
+            document.getElementById('foodEditorContent').classList.add('hidden');
+            document.getElementById('benefitDisplayContent').classList.remove('hidden');
+
+            const targetFoodIds = appData.associations
+                .filter(assoc => assoc.benefitId === benefitId)
+                .map(assoc => assoc.foodId);
+
+            // FIX: Safely display ALL matching foods, even if food.page evaluates to undefined/null/empty
+            const associatedFoods = appData.foods.filter(f => targetFoodIds.includes(f.id));
+            const container = document.getElementById('associatedFoodsContainer');
+            container.innerHTML = '';
+
+            if (associatedFoods.length === 0) {
+                container.innerHTML = `<p class="p-4 text-sm text-gray-400 dark:text-gray-500 text-center">No foods currently mapped to this condition.</p>`;
+                return;
+            }
+
+            associatedFoods.forEach(food => {
+                const item = document.createElement('div');
+                item.className = "p-3 flex justify-between items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200";
+                item.innerHTML = `
+                    <span class="font-medium">${food.name}</span>
+                    <span class="text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded">Page ${food.page || 'Not Listed'}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        document.getElementById('saveChangesBtn').addEventListener('click', function() {
+            if (!selectedFoodId) return;
+
+            const food = appData.foods.find(f => f.id === selectedFoodId);
+            food.name = document.getElementById('editName').value;
+            const pageVal = document.getElementById('editPage').value;
+            food.page = pageVal ? parseInt(pageVal, 10) : null;
+
+            appData.associations = appData.associations.filter(assoc => assoc.foodId !== selectedFoodId);
+
+            const checkboxes = document.querySelectorAll('#benefitsCheckboxes input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    appData.associations.push({
+                        foodId: selectedFoodId,
+                        benefitId: cb.dataset.benefitId
+                    });
+                }
+            });
+
+            renderExplorer();
+            alert('Memory matrix updated locally!');
+        });
+
+        document.getElementById('exportYamlBtn').addEventListener('click', function() {
+            if (!appData) return;
+            
+            const yamlString = jsyaml.dump(appData, { lineWidth: -1, noRefs: true });
+            
+            const blob = new Blob([yamlString], { type: 'text/yaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'LIFE-CHANGING-FOODS.yml';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
