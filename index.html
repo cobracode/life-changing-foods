@@ -36,13 +36,29 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <div class="md:col-span-1 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm h-[500px] md:h-[650px] flex flex-col">
-                <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4">
-                    <button id="tabFood" class="w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer">
-                        By Food
-                    </button>
-                    <button id="tabBenefit" class="w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer">
-                        By Benefit
-                    </button>
+                <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-700 mb-4 pb-1">
+                    <div class="flex w-1/2 mr-2">
+                        <button id="tabFood" class="w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer">
+                            By Food
+                        </button>
+                        <button id="tabBenefit" class="w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer">
+                            By Benefit
+                        </button>
+                    </div>
+
+                    <!-- NEW ADD BUTTONS -->
+                    <div class="flex space-x-2 h-full items-end">
+                        <button id="btnNewFood" title="Add new food item" class="p-2 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors" title="New Food">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button id="btnNewBenefit" title="Add new benefit category" class="p-2 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors" title="New Benefit">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <div id="explorerTitle" class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">Foods List</div>
@@ -72,9 +88,14 @@
                                 </div>
                         </div>
 
-                        <button id="saveChangesBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm transition cursor-pointer">
-                            Update Memory State
-                        </button>
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button id="cancelEditBtn" class="hidden bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-md shadow-sm transition cursor-pointer">
+                                Cancel
+                            </button>
+                            <button id="saveChangesBtn" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm transition cursor-pointer">
+                                Update Memory State
+                            </button>
+                        </div>
                     </div>
                     
                     <div id="benefitDisplayContent" class="hidden space-y-4 mt-4">
@@ -99,261 +120,440 @@
     </div>
 
     <script>
-        let appData = null;
-        let selectedFoodId = null;
-        let selectedBenefitId = null;
-        let currentTab = 'food';
+        // --- WRAPPER ADDED HERE ---
+        document.addEventListener('DOMContentLoaded', function() {
+            let appData = null;
+            let selectedFoodId = null;
+            let selectedBenefitId = null;
+            let currentTab = 'food';
+            
+            // --- Counter for generating IDs ---
+            // We will increase this based on loaded data so we don't clash with existing IDs
+            let maxFoodId, maxBenefitId = 0;
 
-        // --- Theme Engine Initialization ---
-        const themeSelect = document.getElementById('themeSelect');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            // --- Theme Engine Initialization ---
+            const themeSelect = document.getElementById('themeSelect');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-        function applyTheme() {
-            const currentSetting = localStorage.getItem('editor-theme') || 'system';
-            themeSelect.value = currentSetting;
+            function applyTheme() {
+                const currentSetting = localStorage.getItem('editor-theme') || 'system';
+                themeSelect.value = currentSetting;
 
-            if (currentSetting === 'dark' || (currentSetting === 'system' && systemPrefersDark.matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+                if (currentSetting === 'dark' || (currentSetting === 'system' && systemPrefersDark.matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
             }
-        }
 
-        themeSelect.addEventListener('change', (e) => {
-            localStorage.setItem('editor-theme', e.target.value);
-            applyTheme();
-        });
-
-        // Listen for live external host system preference adaptations
-        systemPrefersDark.addEventListener('change', () => {
-            if (localStorage.getItem('editor-theme') === 'system') {
+            themeSelect.addEventListener('change', (e) => {
+                localStorage.setItem('editor-theme', e.target.value);
                 applyTheme();
-            }
-        });
+            });
 
-        // Bootstrap visual settings runtime state 
-        applyTheme();
+            systemPrefersDark.addEventListener('change', () => {
+                if (localStorage.getItem('editor-theme') === 'system') {
+                    applyTheme();
+                }
+            });
 
-        // --- Data Handling Core Modules ---
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            applyTheme();
 
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    const parsed = jsyaml.load(evt.target.result);
-                    if (!parsed || typeof parsed !== 'object') {
-                        throw new Error("Invalid format structure object layout detected.");
+            // --- Data Handling Core Modules ---
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const parsed = jsyaml.load(evt.target.result);
+                        if (!parsed || typeof parsed !== 'object') {
+                            throw new Error("Invalid format structure object layout detected.");
+                        }
+
+                        appData = parsed;
+                        
+                        if (!appData.foods || !Array.isArray(appData.foods)) appData.foods = [];
+                        if (!appData.healthBenefits || !Array.isArray(appData.healthBenefits)) appData.healthBenefits = [];
+                        if (!appData.associations || !Array.isArray(appData.associations)) appData.associations = [];
+
+                        // Sort and initialize counter
+                        appData.foods.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                        appData.healthBenefits.sort((a, b) => (a.benefit || '').localeCompare(b.benefit || ''));
+
+                        // Set ID counter to max existing ID + 1 to prevent collisions
+                        // We need to handle the 'b' prefix for benefits and 'f' prefix for foods separately
+                        const foodIds = appData.foods.map(f => f.id).filter(id => typeof id === 'string' && id.startsWith('f'));
+                        const benefitIds = appData.healthBenefits.map(b => b.id).filter(id => typeof id === 'string' && id.startsWith('b'));
+                        
+                        maxFoodId = Number(foodIds.length > 0 ? Math.max(...foodIds.map(id => parseInt(id.slice(1)) || 0)) : 0);
+                        maxBenefitId = Number(benefitIds.length > 0 ? Math.max(...benefitIds.map(id => parseInt(id.slice(1)) || 0)) : 0);
+
+                        resetActiveSelections();
+                        renderExplorer();
+                        
+                        document.getElementById('exportSection').classList.remove('hidden');
+                    } catch (err) {
+                        console.error(err);
+                        alert('Error parsing YAML file: ' + err.message);
                     }
+                };
+                reader.readAsText(file);
+            });
 
-                    appData = parsed;
-                    
-                    if (!appData.foods || !Array.isArray(appData.foods)) appData.foods = [];
-                    if (!appData.healthBenefits || !Array.isArray(appData.healthBenefits)) appData.healthBenefits = [];
-                    if (!appData.associations || !Array.isArray(appData.associations)) appData.associations = [];
+            document.getElementById('tabFood').addEventListener('click', () => switchTab('food'));
+            document.getElementById('tabBenefit').addEventListener('click', () => switchTab('benefit'));
 
-                    appData.foods.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    appData.healthBenefits.sort((a, b) => (a.benefit || '').localeCompare(b.benefit || ''));
-
-                    resetActiveSelections();
-                    renderExplorer();
-                    
-                    document.getElementById('exportSection').classList.remove('hidden');
-                } catch (err) {
-                    console.error(err);
-                    alert('Error parsing YAML file: ' + err.message);
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        document.getElementById('tabFood').addEventListener('click', () => switchTab('food'));
-        document.getElementById('tabBenefit').addEventListener('click', () => switchTab('benefit'));
-
-        function switchTab(tab) {
-            if (!appData || currentTab === tab) return;
-            currentTab = tab;
-            
-            const btnFood = document.getElementById('tabFood');
-            const btnBenefit = document.getElementById('tabBenefit');
-            
-            if (tab === 'food') {
-                btnFood.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
-                btnBenefit.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
-                document.getElementById('explorerTitle').innerText = "Foods List";
-            } else {
-                btnBenefit.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
-                btnFood.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
-                document.getElementById('explorerTitle').innerText = "Health Benefits Index";
-            }
-            
-            resetActiveSelections();
-            renderExplorer();
-            showPlaceholder();
-        }
-
-        function resetActiveSelections() {
-            selectedFoodId = null;
-            selectedBenefitId = null;
-        }
-
-        function renderExplorer() {
-            const listContainer = document.getElementById('explorerList');
-            listContainer.innerHTML = '';
-            if (!appData) return;
-
-            if (currentTab === 'food') {
-                if (appData.foods.length === 0) {
-                    listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No food items found.</p>`;
-                    return;
-                }
-                appData.foods.forEach(food => {
-                    const btn = document.createElement('button');
-                    btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
-                        selectedFoodId === food.id 
-                        ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
-                        : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`;
-                    btn.innerHTML = `<div class="flex justify-between items-center"><span>${food.name}</span><span class="text-xs text-gray-400 dark:text-gray-500">p. ${food.page || '--'}</span></div>`;
-                    btn.onclick = () => selectFood(food.id);
-                    listContainer.appendChild(btn);
-                });
-            } else {
-                if (appData.healthBenefits.length === 0) {
-                    listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No health benefits items found.</p>`;
-                    return;
-                }
-                appData.healthBenefits.forEach(benefit => {
-                    const count = appData.associations.filter(a => a.benefitId === benefit.id).length;
-                    
-                    const btn = document.createElement('button');
-                    btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
-                        selectedBenefitId === benefit.id 
-                        ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
-                        : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`;
-                    btn.innerHTML = `<div class="flex justify-between items-center"><span>${benefit.benefit}</span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">${count}</span></div>`;
-                    btn.onclick = () => selectBenefit(benefit.id);
-                    listContainer.appendChild(btn);
-                });
-            }
-        }
-
-        function showPlaceholder() {
-            document.getElementById('panelPlaceholder').classList.remove('hidden');
-            document.getElementById('foodEditorContent').classList.add('hidden');
-            document.getElementById('benefitDisplayContent').classList.add('hidden');
-            document.getElementById('panelHeader').innerText = "Panel Preview";
-        }
-
-        function selectFood(foodId) {
-            selectedFoodId = foodId;
-            renderExplorer();
-
-            const food = appData.foods.find(f => f.id === foodId);
-            document.getElementById('panelHeader').innerText = `Editing: ${food.name}`;
-            
-            document.getElementById('panelPlaceholder').classList.add('hidden');
-            document.getElementById('benefitDisplayContent').classList.add('hidden');
-            document.getElementById('foodEditorContent').classList.remove('hidden');
-
-            document.getElementById('editName').value = food.name || '';
-            document.getElementById('editPage').value = food.page || '';
-
-            const activeBenefitIds = appData.associations
-                .filter(assoc => assoc.foodId === foodId)
-                .map(assoc => assoc.benefitId);
-
-            const checkboxesContainer = document.getElementById('benefitsCheckboxes');
-            checkboxesContainer.innerHTML = '';
-
-            appData.healthBenefits.forEach(benefit => {
-                const label = document.createElement('label');
-                label.className = "flex items-center space-x-3 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300";
+            function switchTab(tab) {
+                if (!appData || currentTab === tab) return;
+                currentTab = tab;
                 
-                const isChecked = activeBenefitIds.includes(benefit.id) ? 'checked' : '';
-                label.innerHTML = `
-                    <input type="checkbox" data-benefit-id="${benefit.id}" ${isChecked} class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 h-4 w-4" />
-                    <span>${benefit.benefit}</span>
-                `;
-                checkboxesContainer.appendChild(label);
-            });
-        }
-
-        function selectBenefit(benefitId) {
-            selectedBenefitId = benefitId;
-            renderExplorer();
-
-            const benefit = appData.healthBenefits.find(b => b.id === benefitId);
-            document.getElementById('panelHeader').innerText = `Linked Foods: ${benefit.benefit}`;
-
-            document.getElementById('panelPlaceholder').classList.add('hidden');
-            document.getElementById('foodEditorContent').classList.add('hidden');
-            document.getElementById('benefitDisplayContent').classList.remove('hidden');
-
-            const targetFoodIds = appData.associations
-                .filter(assoc => assoc.benefitId === benefitId)
-                .map(assoc => assoc.foodId);
-
-            // FIX: Safely display ALL matching foods, even if food.page evaluates to undefined/null/empty
-            const associatedFoods = appData.foods.filter(f => targetFoodIds.includes(f.id));
-            const container = document.getElementById('associatedFoodsContainer');
-            container.innerHTML = '';
-
-            if (associatedFoods.length === 0) {
-                container.innerHTML = `<p class="p-4 text-sm text-gray-400 dark:text-gray-500 text-center">No foods currently mapped to this condition.</p>`;
-                return;
+                const btnFood = document.getElementById('tabFood');
+                const btnBenefit = document.getElementById('tabBenefit');
+                
+                if (tab === 'food') {
+                    btnFood.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
+                    btnBenefit.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
+                    document.getElementById('explorerTitle').innerText = "Foods List";
+                } else {
+                    btnBenefit.className = "w-1/2 pb-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer";
+                    btnFood.className = "w-1/2 pb-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none cursor-pointer";
+                    document.getElementById('explorerTitle').innerText = "Health Benefits Index";
+                }
+                
+                resetActiveSelections();
+                renderExplorer();
+                showPlaceholder();
             }
 
-            associatedFoods.forEach(food => {
-                const item = document.createElement('div');
-                item.className = "p-3 flex justify-between items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200";
-                item.innerHTML = `
-                    <span class="font-medium">${food.name}</span>
-                    <span class="text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded">Page ${food.page || 'Not Listed'}</span>
-                `;
-                container.appendChild(item);
-            });
-        }
+            function resetActiveSelections() {
+                selectedFoodId = null;
+                selectedBenefitId = null;
+            }
 
-        document.getElementById('saveChangesBtn').addEventListener('click', function() {
-            if (!selectedFoodId) return;
+            function renderExplorer() {
+                const listContainer = document.getElementById('explorerList');
+                listContainer.innerHTML = '';
+                if (!appData) return;
 
-            const food = appData.foods.find(f => f.id === selectedFoodId);
-            food.name = document.getElementById('editName').value;
-            const pageVal = document.getElementById('editPage').value;
-            food.page = pageVal ? parseInt(pageVal, 10) : null;
-
-            appData.associations = appData.associations.filter(assoc => assoc.foodId !== selectedFoodId);
-
-            const checkboxes = document.querySelectorAll('#benefitsCheckboxes input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                if (cb.checked) {
-                    appData.associations.push({
-                        foodId: selectedFoodId,
-                        benefitId: cb.dataset.benefitId
+                if (currentTab === 'food') {
+                    if (appData.foods.length === 0) {
+                        listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No food items found.</p>`;
+                        return;
+                    }
+                    appData.foods.forEach(food => {
+                        const btn = document.createElement('button');
+                        btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
+                            selectedFoodId === food.id 
+                            ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
+                            : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`;
+                        btn.innerHTML = `<div class="flex justify-between items-center"><span>${food.name}</span><span class="text-xs text-gray-400 dark:text-gray-500">p. ${food.page || '--'}</span></div>`;
+                        btn.onclick = () => selectFood(food.id);
+                        listContainer.appendChild(btn);
+                    });
+                } else {
+                    if (appData.healthBenefits.length === 0) {
+                        listContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 text-sm">No health benefits items found.</p>`;
+                        return;
+                    }
+                    appData.healthBenefits.forEach(benefit => {
+                        const count = appData.associations.filter(a => a.benefitId === benefit.id).length;
+                        
+                        const btn = document.createElement('button');
+                        btn.className = `w-full text-left p-3 rounded-lg text-sm transition font-medium border cursor-pointer ${
+                            selectedBenefitId === benefit.id 
+                            ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500 text-indigo-700 dark:text-indigo-300' 
+                            : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`;
+                        btn.innerHTML = `<div class="flex justify-between items-center"><span>${benefit.benefit}</span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">${count}</span></div>`;
+                        btn.onclick = () => selectBenefit(benefit.id);
+                        listContainer.appendChild(btn);
                     });
                 }
+            }
+
+            function showPlaceholder() {
+                document.getElementById('panelPlaceholder').classList.remove('hidden');
+                document.getElementById('foodEditorContent').classList.add('hidden');
+                document.getElementById('benefitDisplayContent').classList.add('hidden');
+                document.getElementById('cancelEditBtn').classList.add('hidden');
+                document.getElementById('panelHeader').innerText = "Panel Preview";
+            }
+
+            // --- Modified selectFood to handle both editing and creating ---
+            function selectFood(foodId, isNew = false) {
+                selectedFoodId = foodId;
+                currentTab = 'food'; // Force tab switch to food
+                switchTab('food'); // Apply visual tab changes
+                
+                // If creating new item, we temporarily use the ID, but don't search for it in array yet
+                const food = appData.foods.find(f => f.id === foodId);
+                
+                document.getElementById('panelPlaceholder').classList.add('hidden');
+                document.getElementById('benefitDisplayContent').classList.add('hidden');
+                document.getElementById('foodEditorContent').classList.remove('hidden');
+
+                // UI Updates based on New vs Edit
+                const saveBtn = document.getElementById('saveChangesBtn');
+                const cancelBtn = document.getElementById('cancelEditBtn');
+                const panelHeader = document.getElementById('panelHeader');
+
+                if (isNew) {
+                    panelHeader.innerText = "Add New Food Item";
+                    saveBtn.innerText = "Add New Food";
+                    cancelBtn.classList.remove('hidden');
+                    document.getElementById('editName').value = '';
+                    document.getElementById('editPage').value = '';
+                } else {
+                    panelHeader.innerText = `Editing: ${food.name}`;
+                    saveBtn.innerText = "Update Memory State";
+                    cancelBtn.classList.add('hidden');
+                    document.getElementById('editName').value = food.name || '';
+                    document.getElementById('editPage').value = food.page || '';
+                }
+
+                // Populate Checkboxes
+                const checkboxesContainer = document.getElementById('benefitsCheckboxes');
+                checkboxesContainer.innerHTML = '';
+
+                // Only pre-check boxes if it's an existing food
+                const activeBenefitIds = (!isNew && food) ? 
+                    appData.associations.filter(assoc => assoc.foodId === foodId).map(assoc => assoc.benefitId) 
+                    : [];
+
+                if(appData.healthBenefits.length === 0 && !isNew) {
+                    checkboxesContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No benefits defined yet.</p>';
+                } else {
+                    appData.healthBenefits.forEach(benefit => {
+                        const label = document.createElement('label');
+                        label.className = "flex items-center space-x-3 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300";
+                        
+                        const isChecked = activeBenefitIds.includes(benefit.id) ? 'checked' : '';
+                        label.innerHTML = `
+                            <input type="checkbox" data-benefit-id="${benefit.id}" ${isChecked} class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 h-4 w-4" />
+                            <span>${benefit.benefit}</span>
+                        `;
+                        checkboxesContainer.appendChild(label);
+                    });
+                }
+
+                renderExplorer();
+            }
+
+            function selectBenefit(benefitId) {
+                selectedBenefitId = benefitId;
+                renderExplorer();
+
+                const benefit = appData.healthBenefits.find(b => b.id === benefitId);
+                document.getElementById('panelHeader').innerText = `Linked Foods: ${benefit.benefit}`;
+
+                document.getElementById('panelPlaceholder').classList.add('hidden');
+                document.getElementById('foodEditorContent').classList.add('hidden');
+                document.getElementById('benefitDisplayContent').classList.remove('hidden');
+
+                const targetFoodIds = appData.associations
+                    .filter(assoc => assoc.benefitId === benefitId)
+                    .map(assoc => assoc.foodId);
+
+                const associatedFoods = appData.foods.filter(f => targetFoodIds.includes(f.id));
+                const container = document.getElementById('associatedFoodsContainer');
+                container.innerHTML = '';
+
+                if (associatedFoods.length === 0) {
+                    container.innerHTML = `<p class="p-4 text-sm text-gray-400 dark:text-gray-500 text-center">No foods currently mapped to this condition.</p>`;
+                    return;
+                }
+
+                associatedFoods.forEach(food => {
+                    const item = document.createElement('div');
+                    item.className = "p-3 flex justify-between items-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200";
+                    item.innerHTML = `
+                        <span class="font-medium">${food.name}</span>
+                        <span class="text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded">Page ${food.page || 'Not Listed'}</span>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+
+            // --- New Feature: Add New Food ---
+            document.getElementById('btnNewFood').addEventListener('click', () => {
+                if(!appData) return alert("Please upload a file first.");
+                const newId = `f${String(++maxFoodId)}`;
+                selectFood(newId, true); // Pass true to indicate it's a new item
             });
 
-            renderExplorer();
-            alert('Memory matrix updated locally!');
-        });
+            // --- New Feature: Add New Benefit (using Modal) ---
+            const inputModal = document.getElementById('inputModal');
+            const modalInput = document.getElementById('modalInput');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalOkBtn = document.getElementById('modalOkBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            
+            let modalCallback = null;
 
-        document.getElementById('exportYamlBtn').addEventListener('click', function() {
-            if (!appData) return;
+            document.getElementById('btnNewBenefit').addEventListener('click', () => {
+                if(!appData) return alert("Please upload a file first.");
+                
+                // Setup Modal
+                modalInput.value = '';
+                modalTitle.innerText = "Add New Benefit";
+                modalInput.focus();
+                
+                // Set callback for the "OK" button
+                modalCallback = (val) => {
+                    if (val && val.trim() !== "") {
+                        // Generate ID with 'b' prefix: b + counter
+                        const newId = 'b' + ++maxBenefitId;
+                        
+                        appData.healthBenefits.push({
+                            id: newId,
+                            benefit: val.trim()
+                        });
+                        
+                        // Re-sort
+                        appData.healthBenefits.sort((a, b) => (a.benefit || '').localeCompare(b.benefit || ''));
+                        
+                        // Refresh view
+                        renderExplorer();
+                    }
+                };
+
+                // Show Modal
+                inputModal.classList.remove('hidden');
+            });
+
+            // Modal Event Listeners
+            modalOkBtn.addEventListener('click', () => {
+                if (modalCallback) {
+                    modalCallback(modalInput.value);
+                    inputModal.classList.add('hidden');
+                    modalCallback = null;
+                }
+            });
+
+            modalCancelBtn.addEventListener('click', () => {
+                inputModal.classList.add('hidden');
+                modalCallback = null;
+            });
             
-            const yamlString = jsyaml.dump(appData, { lineWidth: -1, noRefs: true });
+            // Allow pressing "Enter" to submit in the modal
+            modalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && modalOkBtn) modalOkBtn.click();
+            });
+
+
+            // Modal Event Listeners
+            modalOkBtn.addEventListener('click', () => {
+                if (modalCallback) {
+                    modalCallback(modalInput.value);
+                    inputModal.classList.add('hidden');
+                    modalCallback = null;
+                }
+            });
+
+            modalCancelBtn.addEventListener('click', () => {
+                inputModal.classList.add('hidden');
+                modalCallback = null;
+            });
             
-            const blob = new Blob([yamlString], { type: 'text/yaml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'LIFE-CHANGING-FOODS.yml';
-            a.click();
-            URL.revokeObjectURL(url);
+            // Allow pressing "Enter" to submit in the modal
+            modalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && modalOkBtn) modalOkBtn.click();
+            });
+
+
+            // --- New Feature: Cancel Edit ---
+            document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                showPlaceholder();
+                renderExplorer();
+            });
+
+            // --- Update Save Logic ---
+            document.getElementById('saveChangesBtn').addEventListener('click', function() {
+                const nameVal = document.getElementById('editName').value;
+                const pageVal = document.getElementById('editPage').value;
+
+                if (!nameVal) {
+                    alert("Food Name is required.");
+                    return;
+                }
+
+                const checkboxes = document.querySelectorAll('#benefitsCheckboxes input[type="checkbox"]');
+                const selectedBenefitIds = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.dataset.benefitId);
+
+                // Logic for NEW Item
+                if (selectedFoodId === appData.foods.find(f => f.id === selectedFoodId)?.id) {
+                    // Item exists, update it
+                    const food = appData.foods.find(f => f.id === selectedFoodId);
+                    food.name = nameVal;
+                    food.page = pageVal ? parseInt(pageVal, 10) : null;
+
+                    // Remove old associations
+                    appData.associations = appData.associations.filter(assoc => assoc.foodId !== selectedFoodId);
+                    
+                    // Add new associations
+                    selectedBenefitIds.forEach(bId => {
+                        appData.associations.push({ foodId: selectedFoodId, benefitId: bId });
+                    });
+                    alert('Memory matrix updated locally!');
+
+                } else {
+                    // Item is NEW, push to array
+                    const newFood = {
+                        id: selectedFoodId,
+                        name: nameVal,
+                        page: pageVal ? parseInt(pageVal, 10) : null
+                    };
+                    appData.foods.push(newFood);
+
+                    // Add associations
+                    selectedBenefitIds.forEach(bId => {
+                        appData.associations.push({ foodId: selectedFoodId, benefitId: bId });
+                    });
+
+                    // Re-sort foods
+                    appData.foods.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    
+                    // Update ID to be selected properly
+                    selectedFoodId = newFood.id;
+                    alert('New food added!');
+                }
+
+                renderExplorer();
+                showPlaceholder();
+            });
+
+            document.getElementById('exportYamlBtn').addEventListener('click', function() {
+                if (!appData) return;
+                
+                const yamlString = jsyaml.dump(appData, { lineWidth: -1, noRefs: true });
+                
+                const blob = new Blob([yamlString], { type: 'text/yaml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'LIFE-CHANGING-FOODS.yml';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
         });
     </script>
+
+        <!-- NEW: Add this Modal HTML -->
+        <div id="inputModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 border border-gray-200 dark:border-gray-700">
+                <h3 id="modalTitle" class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">Enter Name</h3>
+                <input type="text" id="modalInput" class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <div class="flex justify-end space-x-2">
+                    <button id="modalCancelBtn" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">Cancel</button>
+                    <button id="modalOkBtn" class="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">OK</button>
+                </div>
+            </div>
+        </div>
+    
 </body>
 </html>
